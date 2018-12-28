@@ -10,13 +10,6 @@ fn main() {
     );
 }
 
-fn simulated_expensive_calculation(intensity: u32) -> u32 {
-    println!("calculating slowly...");
-    thread::sleep(Duration::from_secs(2));
-    intensity
-}
-
-
 fn generate_workout(intensity: u32, random_number: u32){
     let expensive_closure = |num| {
         println!("calculating slowly...");
