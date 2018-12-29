@@ -11,31 +11,32 @@ fn main() {
     );
 }
 
-struct Cacher<T> 
-    where T: Fn(u32)->u32 
+struct Cacher<T,U> 
+    where T: Fn(U)->U 
 {
     calculation: T,
-    results: HashMap<u32, u32>,
+    results: HashMap<U, U>,
 }
 
 
-impl<T> Cacher<T>
-    where T: Fn(u32)->u32
+impl<T,U> Cacher<T,U>
+    where T: Fn(U)->U,
+          U: Eq + std::hash::Hash + Copy
 {
-    fn new(calculation: T) -> Cacher<T> {
+    fn new(calculation: T) -> Cacher<T,U> {
         Cacher {
             calculation,
             results: HashMap::new(),
         }
     }
 
-    fn value(&mut self, arg: u32) -> u32 {
+    fn value(&mut self, arg: U) -> U {
+
         match self.results.get(&arg) {
             Some(v) => *v,
             None => {
-                let result = (self.calculation)(arg);
-                self.results.insert(arg, result);
-                result
+                self.results.insert(arg, (self.calculation)(arg));
+                self.value(arg)
             }
         }
     }
@@ -52,12 +53,12 @@ fn generate_workout(intensity: u32, random_number: u32){
     if intensity < 25 {
         println!(
             "Today do {} pushups",
-            expensive_result.value(intensity)
+            expensive_result.value(&intensity)
         );
 
         println!(
             "Then do {} situps",
-            expensive_result.value(intensity)
+            expensive_result.value(&intensity)
         );
     } else {
         if random_number == 3 {
@@ -65,7 +66,7 @@ fn generate_workout(intensity: u32, random_number: u32){
         } else {
             println!(
                 "Today run for {} minutes.",
-                expensive_result.value(intensity) 
+                expensive_result.value(&intensity) 
             );
         }
     }
