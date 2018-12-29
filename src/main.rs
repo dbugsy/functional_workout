@@ -11,26 +11,27 @@ fn main() {
     );
 }
 
-struct Cacher<T,U> 
-    where T: Fn(U)->U 
+struct Cacher<T,In,Out> 
+    where T: Fn(In)->Out 
 {
     calculation: T,
-    results: HashMap<U, U>,
+    results: HashMap<In, Out>,
 }
 
 
-impl<T,U> Cacher<T,U>
-    where T: Fn(U)->U,
-          U: Eq + std::hash::Hash + Copy
+impl<T,In,Out> Cacher<T,In,Out>
+    where T: Fn(In)->Out,
+          In: Eq + std::hash::Hash + Copy,
+          Out: Eq + std::hash::Hash + Copy,
 {
-    fn new(calculation: T) -> Cacher<T,U> {
+    fn new(calculation: T) -> Cacher<T,In,Out> {
         Cacher {
             calculation,
             results: HashMap::new(),
         }
     }
 
-    fn value(&mut self, arg: U) -> U {
+    fn value(&mut self, arg: In) -> Out {
 
         match self.results.get(&arg) {
             Some(v) => *v,
